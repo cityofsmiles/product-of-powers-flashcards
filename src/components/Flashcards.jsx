@@ -14,20 +14,24 @@ function randChoice(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// Helper to format each term
+// Format a single term
 function term(coef, variable, exponent) {
-  // Omit coefficient 1, show "-" for -1
+  if (exponent === 0) return coef === 1 ? "1" : coef.toString();
   let coefStr = "";
   if (coef === -1) coefStr = "-";
   else if (coef !== 1) coefStr = coef.toString();
-
-  // Exponent rules
-  if (exponent === 0) return coef ? `${coef}` : "1"; // anything^0 → 1 unless coef is empty
-  if (exponent === 1) return `${coefStr}${variable}`; // exponent 1 → variable
+  if (exponent === 1) return `${coefStr}${variable}`;
   return `${coefStr}${variable}^${exponent}`;
 }
 
-// Generate a flashcard for one of the four exponent cases
+// Multiply terms of the same variable
+function multiplyTerms(coef1, exp1, coef2, exp2, variable) {
+  const newCoef = coef1 * coef2;
+  const newExp = exp1 + exp2;
+  return term(newCoef, variable, newExp);
+}
+
+// Generate a flashcard for one of the four cases
 function generateFlashcard() {
   const caseNum = randInt(1, 4);
 
@@ -37,7 +41,7 @@ function generateFlashcard() {
   do { b = randInt(-6, 6); } while (b === 0);
 
   const v1 = randChoice(VARIABLES);
-  const v2 = randChoice(VARIABLES.filter((x) => x !== v1)); // For case 4
+  const v2 = randChoice(VARIABLES.filter((x) => x !== v1));
   const m = randInt(-4, 4);
   const n = randInt(-4, 4);
   const p = randInt(0, 4);
@@ -47,40 +51,39 @@ function generateFlashcard() {
   let answer = "";
 
   switch (caseNum) {
-    case 1: // Single variable, positive exponents
+    case 1: { // Single variable, positive exponents
       const m1 = Math.max(1, m);
       const n1 = Math.max(1, n);
       expr = `(${term(a, v1, m1)})(${term(b, v1, n1)})`;
-      answer = `${a * b}${v1}^${m1 + n1}`;
+      answer = multiplyTerms(a, m1, b, n1, v1);
       break;
-
-    case 2: // Single variable, negative exponents
-      const m2 = Math.max(1, m);
-      const n2 = -Math.abs(n);
-      expr = `(${term(a, v1, m2)})(${term(b, v1, n2)})`;
-      const exponent2 = m2 + n2;
-      if (exponent2 > 0) {
-        answer = `${a * b}${v1}^${exponent2}`;
-      } else if (exponent2 === 0) {
-        answer = `${a * b}`;
-      } else {
-        answer = `1/${a * b}${v1}^${-exponent2}`;
-      }
+    }
+    case 2: { // Single variable, negative exponents
+      const m1 = Math.max(1, m);
+      const n1 = -Math.abs(n);
+      expr = `(${term(a, v1, m1)})(${term(b, v1, n1)})`;
+      answer = multiplyTerms(a, m1, b, n1, v1);
       break;
-
-    case 3: // Single variable, zero exponent
-      const m3 = Math.max(1, m);
-      expr = `(${term(a, v1, m3)})(${term(b, v1, 0)})`;
-      answer = `${a * b}${v1}^${m3}`;
+    }
+    case 3: { // Single variable, zero exponent
+      const m1 = Math.max(1, m);
+      expr = `(${term(a, v1, m1)})(${term(b, v1, 0)})`;
+      answer = multiplyTerms(a, m1, b, 0, v1);
       break;
-
-    case 4: // Two variables, non-negative exponents
-      const m4 = Math.max(0, m);
-      const n4 = Math.max(0, n);
-      const p4 = Math.max(0, p);
-      const q4 = Math.max(0, q);
-      expr = `(${term(a, v1, m4)}${term(1, v2, n4)})(${term(b, v1, p4)}${term(1, v2, q4)})`;
-      answer = `${a * b}${v1}^${m4 + p4}${v2}^${n4 + q4}`;
+    }
+    case 4: { // Two variables, non-negative exponents
+      const m1 = Math.max(0, m);
+      const n1 = Math.max(0, n);
+      const p1 = Math.max(0, p);
+      const q1 = Math.max(0, q);
+      expr = `(${term(a, v1, m1)}${term(1, v2, n1)})(${term(b, v1, p1)}${term(1, v2, q1)})`;
+      const coef = a * b;
+      const expV1 = m1 + p1;
+      const expV2 = n1 + q1;
+      answer = `${coef}${v1}^${expV1}${v2}^${expV2}`;
+      break;
+    }
+    default:
       break;
   }
 
@@ -120,7 +123,7 @@ export default function Flashcards() {
   if (!flashcards.length) {
     return (
       <div className="flashcards-container">
-        <h1>Exponent Rule Flashcards</h1>
+        <h1>Product of Powers Flashcards</h1>
         <button className="btn-primary" onClick={startPractice}>
           Start Practice
         </button>
@@ -167,7 +170,8 @@ export default function Flashcards() {
   const currentCard = flashcards[currentIndex];
   return (
     <div className="flashcards-container">
-      <h1>Question {currentIndex + 1} / {flashcards.length}</h1>
+      <h1>Product of Powers Flashcards</h1>
+      <h2>Question {currentIndex + 1} / {flashcards.length}</h2>
       <div className="flashcard">{currentCard.expr}</div>
       <input
         type="text"
