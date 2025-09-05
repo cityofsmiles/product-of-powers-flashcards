@@ -106,6 +106,7 @@ export default function Flashcards() {
   const [currentIndex,setCurrentIndex] = useState(0);
   const [answers,setAnswers] = useState({});
   const [showResults,setShowResults] = useState(false);
+  const [flip,setFlip] = useState(false);
 
   const startPractice = () => {
     const newSet = Array.from({length:10},()=>generateFlashcard());
@@ -117,8 +118,21 @@ export default function Flashcards() {
 
   const handleAnswer = (value) => setAnswers({...answers,[currentIndex]:value});
   const checkAnswer = (userInput,correct) => userInput.replace(/\s+/g,"")===correct.replace(/\s+/g,"");
-  const prevCard = () => setCurrentIndex(prev=>prev===0?flashcards.length-1:prev-1);
-  const nextCard = () => setCurrentIndex(prev=>prev===flashcards.length-1?0:prev+1);
+
+  const prevCard = () => {
+    setFlip(true);
+    setTimeout(() => {
+      setCurrentIndex(prev=>prev===0?flashcards.length-1:prev-1);
+      setFlip(false);
+    }, 300);
+  };
+  const nextCard = () => {
+    setFlip(true);
+    setTimeout(() => {
+      setCurrentIndex(prev=>prev===flashcards.length-1?0:prev+1);
+      setFlip(false);
+    }, 300);
+  };
 
   if(!flashcards.length){
     return (
@@ -164,7 +178,9 @@ export default function Flashcards() {
       <h1>Product of Powers Flashcards</h1>
       <h3 style={{ fontWeight:"normal", marginBottom:"1rem" }}>by Jonathan R. Bacolod, LPT</h3>
       <h2>Question {currentIndex+1} / {flashcards.length}</h2>
-      <div className="flashcard">{currentCard.expr}</div>
+      <div className={`flashcard ${flip ? "flip" : ""}`}>
+        {currentCard.expr}
+      </div>
       <input
         type="text"
         className="input-answer"
