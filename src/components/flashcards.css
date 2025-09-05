@@ -101,3 +101,24 @@
   gap: 10px;
   margin-top: 1rem;
 }
+
+.flashcard-container {
+  width: 90%;
+  min-height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1000px;
+}
+
+.flashcard {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  width: 100%;
+  min-height: 200px;
+}
