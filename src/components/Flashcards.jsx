@@ -7,12 +7,13 @@ const VARIABLES = ["x","y","z","a","b","c"];
 const randInt = (min,max) => Math.floor(Math.random()*(max-min+1))+min;
 const randChoice = arr => arr[Math.floor(Math.random()*arr.length)];
 
-// Format a single term, always including the variable unless exponent = 0
+// Format a single term, always including variable unless exponent = 0
 function formatTerm(coef, variable, exp){
-  if(exp === 0) return coef.toString();           // variable disappears
+  if(exp === 0) return coef.toString(); // variable disappears
   let coefStr = "";
   if(coef === -1) coefStr="-";
-  else if(coef !== 1) coefStr=coef.toString();
+  else if(coef !== 1) coefStr = coef.toString();
+  // Exponent 1 → variable only
   return exp === 1 ? `${coefStr}${variable}` : `${coefStr}${variable}^${exp}`;
 }
 
@@ -30,9 +31,9 @@ function generateSingleVariable(caseNum){
 
   let exp1, exp2;
   switch(caseNum){
-    case 1: exp1=randInt(1,4); exp2=randInt(1,4); break;
-    case 2: exp1=randInt(1,4); exp2=-randInt(1,4); break;
-    case 3: exp1=randInt(0,4); exp2=randInt(0,4); break;
+    case 1: exp1=randInt(1,4); exp2=randInt(1,4); break;       // positive exponents
+    case 2: exp1=randInt(1,4); exp2=-randInt(1,4); break;      // negative exponents
+    case 3: exp1=randInt(0,4); exp2=randInt(0,4); break;       // zero exponents
     default: exp1=1; exp2=1; break;
   }
 
@@ -57,7 +58,7 @@ function generateTwoVariable(){
   const exp2_v1 = randInt(0,4);
   const exp2_v2 = randInt(0,4);
 
-  // Ensure all terms have at least one variable
+  // Ensure every term has at least one variable and no "1" exponents
   const term1 = `${formatTerm(coef1,v1,exp1_v1)}${formatTerm(1,v2,exp1_v2)}`;
   const term2 = `${formatTerm(coef2,v1,exp2_v1)}${formatTerm(1,v2,exp2_v2)}`;
 
