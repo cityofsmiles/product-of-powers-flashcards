@@ -10,26 +10,25 @@ function randChoice(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// Format a term for flashcard expression (original term)
+// Term for flashcard expression (original term)
 function term(coef, variable, exponent) {
   if (exponent === 0) return `${coef<0?coef:""}${variable}^0`;
   let coefStr = "";
   if (coef === -1) coefStr = "-";
   else if (coef !== 1) coefStr = coef.toString();
-  if (exponent === 1) return `${coefStr}${variable}`;
-  return `${coefStr}${variable}^${exponent}`;
+  return exponent === 1 ? `${coefStr}${variable}` : `${coefStr}${variable}^${exponent}`;
 }
 
-// Format term for answer display, handling negative exponents as fractions
+// Term for answer display
 function termDisplay(coef, variable, exponent) {
-  if (exponent === 0) return ""; // variable disappears
+  if (exponent === 0) return coef.toString(); // include coefficient even if variable disappears
   if (exponent > 0) {
     let coefStr = "";
     if (coef === -1) coefStr = "-";
     else if (coef !== 1) coefStr = coef.toString();
     return exponent === 1 ? `${coefStr}${variable}` : `${coefStr}${variable}^${exponent}`;
   } else {
-    // negative exponent: use fraction
+    // negative exponent: fraction form
     const absExp = Math.abs(exponent);
     const numerator = coef === 1 ? "1" : coef === -1 ? "-1" : coef.toString();
     return `(${numerator})/${variable}${absExp===1?"":`^${absExp}`}`;
@@ -37,11 +36,11 @@ function termDisplay(coef, variable, exponent) {
 }
 
 // Multiply single-variable terms
-function multiplyTerms(coef1, exp1, coef2, exp2, variable) {
+function multiplyTerms(coef1, exp1, coef2, exp2) {
   return { coef: coef1 * coef2, exp: exp1 + exp2 };
 }
 
-// Generate single-variable flashcard
+// Generate single-variable flashcard (Cases 1–3)
 function generateSingleVariableFlashcard(caseNum) {
   const v = randChoice(VARIABLES);
   let a, b;
@@ -57,7 +56,7 @@ function generateSingleVariableFlashcard(caseNum) {
   }
 
   const expr = `(${term(a,v,m)})(${term(b,v,n)})`;
-  const product = multiplyTerms(a,m,b,n,v);
+  const product = multiplyTerms(a,m,b,n);
   let answer;
   if(product.exp === 0){
     answer = product.coef.toString();
@@ -67,7 +66,7 @@ function generateSingleVariableFlashcard(caseNum) {
   return { expr, answer };
 }
 
-// Generate two-variable flashcard
+// Generate two-variable flashcard (Case 4)
 function generateTwoVariableFlashcard() {
   const v1 = randChoice(VARIABLES);
   const v2 = randChoice(VARIABLES.filter(x=>x!==v1));
@@ -88,9 +87,9 @@ function generateTwoVariableFlashcard() {
   const finalExpV1 = exp1_term1+exp1_term2;
   const finalExpV2 = exp2_term1+exp2_term2;
 
-  let part1 = finalExpV1===0?"":termDisplay(finalCoef,v1,finalExpV1);
-  let part2 = finalExpV2===0?"":termDisplay(1,v2,finalExpV2).replace(/^1/,"");
-  const answer = part1+part2;
+  let part1 = finalExpV1===0 ? finalCoef.toString() : termDisplay(finalCoef,v1,finalExpV1);
+  let part2 = finalExpV2===0 ? "" : termDisplay(1,v2,finalExpV2).replace(/^1/,"");
+  const answer = part1 + part2;
 
   return { expr, answer };
 }
