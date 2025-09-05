@@ -11,9 +11,9 @@ function randChoice(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// Format a term: handles coef=1/-1, exponent=0/1
+// Format a term
 function term(coef, variable, exponent) {
-  if (exponent === 0) return coef === 1 ? "1" : coef.toString();
+  if (exponent === 0) return "1";
   let coefStr = "";
   if (coef === -1) coefStr = "-";
   else if (coef !== 1) coefStr = coef.toString();
@@ -26,41 +26,55 @@ function multiplyTerms(coef1, exp1, coef2, exp2, variable) {
   return term(coef1 * coef2, variable, exp1 + exp2);
 }
 
+// Generate a single-variable term
+function generateSingleVariableTerm(minExp=1, maxExp=4) {
+  const v = randChoice(VARIABLES);
+  let coef;
+  do { coef = randInt(-6,6); } while(coef === 0);
+  const exp = randInt(minExp, maxExp);
+  return { coef, v, exp };
+}
+
+// Generate a two-variable term (at least one variable)
+function generateTwoVariableTerm() {
+  const v1 = randChoice(VARIABLES);
+  const v2 = randChoice(VARIABLES.filter(x => x !== v1));
+  let coef;
+  do { coef = randInt(-6,6); } while(coef === 0);
+  let exp1, exp2;
+  do {
+    exp1 = randInt(0,4);
+    exp2 = randInt(0,4);
+  } while (exp1 === 0 && exp2 === 0); // at least one variable
+  return { coef, v1, exp1, v2, exp2 };
+}
+
 // Generate a flashcard
 function generateFlashcard() {
   const caseNum = randInt(1, 4);
   let expr = "", answer = "";
 
-  switch (caseNum) {
+  switch(caseNum) {
     case 1: { // Single variable, positive exponents
-      let a, b;
-      do { a = randInt(-6, 6); } while (a === 0);
-      do { b = randInt(-6, 6); } while (b === 0);
-      const v = randChoice(VARIABLES);
-      const m = randInt(1, 4);
-      const n = randInt(1, 4);
-      expr = `(${term(a, v, m)})(${term(b, v, n)})`;
-      answer = multiplyTerms(a, m, b, n, v);
+      const t1 = generateSingleVariableTerm();
+      const t2 = generateSingleVariableTerm();
+      expr = `(${term(t1.coef, t1.v, t1.exp)})(${term(t2.coef, t2.v, t2.exp)})`;
+      answer = multiplyTerms(t1.coef, t1.exp, t2.coef, t2.exp, t1.v);
       break;
     }
     case 2: { // Single variable, negative exponents
-      let a, b;
-      do { a = randInt(-6, 6); } while (a === 0);
-      do { b = randInt(-6, 6); } while (b === 0);
-      const v = randChoice(VARIABLES);
-      const m = randInt(1, 4);
-      const n = -randInt(1, 4);
-      expr = `(${term(a, v, m)})(${term(b, v, n)})`;
-      answer = multiplyTerms(a, m, b, n, v);
+      const t1 = generateSingleVariableTerm();
+      let t2;
+      do { t2 = generateSingleVariableTerm(); } while (t2.exp === 0); // avoid zero exponent here
+      t2.exp = -Math.abs(t2.exp); // make negative
+      expr = `(${term(t1.coef, t1.v, t1.exp)})(${term(t2.coef, t2.v, t2.exp)})`;
+      answer = multiplyTerms(t1.coef, t1.exp, t2.coef, t2.exp, t1.v);
       break;
     }
     case 3: { // Single variable, zero exponent
-      let a, b;
-      do { a = randInt(-6, 6); } while (a === 0);
-      const v = randChoice(VARIABLES);
-      const m = randInt(1, 4);
-      expr = `(${term(a, v, m)})(${term(1, v, 0)})`;
-      answer = multiplyTerms(a, m, 1, 0, v);
+      const t1 = generateSingleVariableTerm();
+      expr = `(${term(t1.coef, t1.v, t1.exp)})(${term(1, t1.v, 0)})`;
+      answer = multiplyTerms(t1.coef, t1.exp, 1, 0, t1.v);
       break;
     }
     case 4: { // Two variables, non-negative exponents
@@ -74,21 +88,10 @@ function generateFlashcard() {
       answer = `${coef}${t1.v1}^${expV1}${t1.v2}^${expV2}`;
       break;
     }
-    default:
-      break;
+    default: break;
   }
-  return { expr, answer };
-}
 
-// Generate a realistic two-variable term
-function generateTwoVariableTerm() {
-  const v1 = randChoice(VARIABLES);
-  const v2 = randChoice(VARIABLES.filter(x => x !== v1));
-  let coef;
-  do { coef = randInt(-6, 6); } while (coef === 0);
-  const exp1 = randInt(0, 4);
-  const exp2 = randInt(0, 4);
-  return { coef, v1, exp1, v2, exp2 };
+  return { expr, answer };
 }
 
 export default function Flashcards() {
@@ -98,19 +101,19 @@ export default function Flashcards() {
   const [showResults, setShowResults] = useState(false);
 
   const startPractice = () => {
-    const newSet = Array.from({ length: 10 }, () => generateFlashcard());
+    const newSet = Array.from({length:10},()=>generateFlashcard());
     setFlashcards(newSet);
     setCurrentIndex(0);
     setAnswers({});
     setShowResults(false);
   };
 
-  const handleAnswer = (value) => setAnswers({ ...answers, [currentIndex]: value });
+  const handleAnswer = (value) => setAnswers({...answers, [currentIndex]: value});
   const checkAnswer = (userInput, correct) => userInput.replace(/\s+/g,"") === correct.replace(/\s+/g,"");
-  const prevCard = () => setCurrentIndex(prev => prev === 0 ? flashcards.length - 1 : prev - 1);
-  const nextCard = () => setCurrentIndex(prev => prev === flashcards.length - 1 ? 0 : prev + 1);
+  const prevCard = () => setCurrentIndex(prev => prev===0 ? flashcards.length-1 : prev-1);
+  const nextCard = () => setCurrentIndex(prev => prev===flashcards.length-1 ? 0 : prev+1);
 
-  if (!flashcards.length) {
+  if(!flashcards.length){
     return (
       <div className="flashcards-container">
         <h1>Product of Powers Flashcards</h1>
@@ -119,14 +122,14 @@ export default function Flashcards() {
     );
   }
 
-  if (showResults) {
-    const score = flashcards.filter((card,i) => checkAnswer(answers[i]||"", card.answer)).length;
+  if(showResults){
+    const score = flashcards.filter((card,i)=>checkAnswer(answers[i]||"", card.answer)).length;
     return (
       <div className="answer-key-screen">
         <p className="score">Score: {score}/{flashcards.length}</p>
         <h2>Answer Key</h2>
         <div className="answer-key">
-          {flashcards.map((card,i) => {
+          {flashcards.map((card,i)=>{
             const correct = checkAnswer(answers[i]||"", card.answer);
             return (
               <div key={i}>
