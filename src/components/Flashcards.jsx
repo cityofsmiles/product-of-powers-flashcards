@@ -1,44 +1,76 @@
 import React, { useState } from "react";
-import { evaluate, parse } from "mathjs";
 import "./flashcards.css";
 
-// Generate a random algebra expression with proper binomial and clean formatting
-function generateExpression() {
-  // Coefficient ≥ 2
-  const coeff1 = Math.floor(Math.random() * 5) + 2; // 2–6
+// Variables commonly used in high school algebra
+const VARIABLES = ["x", "y", "z", "a", "b", "c"];
 
-  // Inner term: b ≠ 0 to ensure proper binomial
-  let coeff2;
-  do {
-    coeff2 = Math.floor(Math.random() * 9) - 4; // -4 … +4
-  } while (coeff2 === 0); // retry if 0
+// Utility to get random integer between min and max (inclusive)
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-  // Constant term can be anything
-  const constant = Math.floor(Math.random() * 10) - 5; // -5 … +4
+// Utility to randomly pick an element from an array
+function randChoice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 
-  // Inner expression: always a proper binomial
-  const inner = coeff2 > 0 ? `x + ${coeff2}` : `x - ${Math.abs(coeff2)}`;
+// Generate a flashcard for one of the four exponent cases
+function generateFlashcard() {
+  const caseNum = randInt(1, 4);
+  const a = randInt(1, 6);
+  const b = randInt(1, 6);
+  const v1 = randChoice(VARIABLES);
+  const v2 = randChoice(VARIABLES.filter((x) => x !== v1)); // For case 4
+  const m = randInt(-4, 4);
+  const n = randInt(-4, 4);
+  const p = randInt(0, 4);
+  const q = randInt(0, 4);
 
-  // Expression for flashcard: no '*' needed
-  let expr = `${coeff1}(${inner})`;
-  if (constant !== 0) {
-    expr += constant > 0 ? ` + ${constant}` : ` - ${Math.abs(constant)}`;
+  let expr = "";
+  let answer = "";
+
+  switch (caseNum) {
+    case 1: // Single variable, positive exponents
+      const m1 = Math.max(1, m);
+      const n1 = Math.max(1, n);
+      expr = `(${a}${v1}^${m1})(${b}${v1}^${n1})`;
+      answer = `${a * b}${v1}^${m1 + n1}`;
+      break;
+
+    case 2: // Single variable, negative exponents
+      const m2 = Math.max(1, m);
+      const n2 = -Math.abs(n);
+      expr = `(${a}${v1}^${m2})(${b}${v1}^${n2})`;
+      const exponent2 = m2 + n2;
+      if (exponent2 > 0) {
+        answer = `${a * b}${v1}^${exponent2}`;
+      } else if (exponent2 === 0) {
+        answer = `${a * b}`;
+      } else {
+        answer = `1/${a * b}${v1}^${-exponent2}`;
+      }
+      break;
+
+    case 3: // Single variable, zero exponent
+      const m3 = Math.max(1, m);
+      expr = `(${a}${v1}^${m3})(${b}${v1}^0)`;
+      answer = `${a * b}${v1}^${m3}`;
+      break;
+
+    case 4: // Two variables, non-negative exponents
+      const m4 = Math.max(0, m);
+      const n4 = Math.max(0, n);
+      const p4 = Math.max(0, p);
+      const q4 = Math.max(0, q);
+      expr = `(${a}${v1}^${m4}${v2}^${n4})(${b}${v1}^${p4}${v2}^${q4})`;
+      answer = `${a * b}${v1}^${m4 + p4}${v2}^${n4 + q4}`;
+      break;
+
+    default:
+      break;
   }
 
-  // Simplified expression for evaluation
-  const a = coeff1;
-  const b = coeff1 * coeff2 + constant;
-
-  // Pretty display for answer key
-  let correctDisplay = `${a}x`;
-  if (b > 0) correctDisplay += ` + ${b}`;
-  else if (b < 0) correctDisplay += ` - ${Math.abs(b)}`;
-
-  return {
-    expr,
-    correctEvalExpr: `${a}*x + ${b}`, // use * here for mathjs evaluation
-    correctDisplay,
-  };
+  return { expr, answer };
 }
 
 export default function Flashcards() {
@@ -48,7 +80,7 @@ export default function Flashcards() {
   const [showResults, setShowResults] = useState(false);
 
   const startPractice = () => {
-    const newSet = Array.from({ length: 10 }, () => generateExpression());
+    const newSet = Array.from({ length: 10 }, () => generateFlashcard());
     setFlashcards(newSet);
     setCurrentIndex(0);
     setAnswers({});
@@ -59,16 +91,9 @@ export default function Flashcards() {
     setAnswers({ ...answers, [currentIndex]: value });
   };
 
-  const checkEquivalence = (userInput, correctExpr) => {
-    try {
-      const cleaned = userInput.toLowerCase().replace(/\s+/g, "");
-      const x = Math.floor(Math.random() * 10) + 1;
-      const userVal = evaluate(parse(cleaned).toString(), { x });
-      const correctVal = evaluate(correctExpr, { x });
-      return Math.abs(userVal - correctVal) < 1e-6;
-    } catch {
-      return false;
-    }
+  const checkAnswer = (userInput, correct) => {
+    // Remove whitespace, lowercase
+    return userInput.replace(/\s+/g, "") === correct.replace(/\s+/g, "");
   };
 
   const prevCard = () => {
@@ -79,11 +104,10 @@ export default function Flashcards() {
     setCurrentIndex((prev) => (prev === flashcards.length - 1 ? 0 : prev + 1));
   };
 
-  // --- Initial screen ---
   if (!flashcards.length) {
     return (
       <div className="flashcards-container">
-        <h1>Algebra Flashcards</h1>
+        <h1>Exponent Rule Flashcards</h1>
         <button className="btn-primary" onClick={startPractice}>
           Start Practice
         </button>
@@ -91,41 +115,42 @@ export default function Flashcards() {
     );
   }
 
-  // --- Answer key screen ---
   if (showResults) {
     const score = flashcards.filter((card, i) =>
-      checkEquivalence(answers[i] || "", card.correctEvalExpr)
+      checkAnswer(answers[i] || "", card.answer)
     ).length;
 
     return (
       <div className="answer-key-screen">
-        {/* Score first */}
         <p className="score">Score: {score}/{flashcards.length}</p>
         <h2>Answer Key</h2>
 
         <div className="answer-key">
           {flashcards.map((card, i) => {
-            const correct = checkEquivalence(answers[i] || "", card.correctEvalExpr);
+            const correct = checkAnswer(answers[i] || "", card.answer);
             return (
               <div key={i}>
                 <p>
                   <strong>Q{i + 1}:</strong> {card.expr}<br />
                   Your Answer: {answers[i] || "(none)"} {correct ? "✓" : "✗"}<br />
-                  Correct Answer: {card.correctDisplay}
+                  Correct Answer: {card.answer}
                 </p>
               </div>
             );
           })}
         </div>
         <div className="button-group">
-          <button className="btn-primary" onClick={startPractice}>Try Another Set</button>
-          <button className="btn-submit" onClick={() => setShowResults(false)}>Back to Cards</button>
+          <button className="btn-primary" onClick={startPractice}>
+            Try Another Set
+          </button>
+          <button className="btn-submit" onClick={() => setShowResults(false)}>
+            Back to Cards
+          </button>
         </div>
       </div>
     );
   }
 
-  // --- Flashcard screen ---
   const currentCard = flashcards[currentIndex];
   return (
     <div className="flashcards-container">
