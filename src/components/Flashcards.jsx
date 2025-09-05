@@ -21,17 +21,16 @@ function term(coef, variable, exponent) {
 
 // Term for answer display
 function termDisplay(coef, variable, exponent) {
-  if (exponent === 0) return ""; // variable disappears
+  if (exponent === 0) return coef.toString(); // variable disappears
   if (exponent > 0) {
     let coefStr = "";
     if (coef === -1) coefStr = "-";
     else if (coef !== 1) coefStr = coef.toString();
     return exponent === 1 ? `${coefStr}${variable}` : `${coefStr}${variable}^${exponent}`;
   } else {
-    // negative exponent: fraction form, only wrap negative numerator
+    // negative exponent: fraction form, no parentheses
     const absExp = Math.abs(exponent);
-    const numerator = coef < 0 ? `(${coef})` : `${coef}`;
-    return `${numerator}/${variable}${absExp===1?"":`^${absExp}`}`;
+    return `${coef}/${variable}${absExp === 1 ? "" : `^${absExp}`}`;
   }
 }
 
@@ -61,8 +60,6 @@ function generateSingleVariableFlashcard(caseNum) {
   let answer;
   if(product.exp === 0){
     answer = product.coef.toString();
-  } else if(product.exp < 0 && Math.abs(product.exp) > 0){
-    answer = termDisplay(product.coef,v,product.exp);
   } else {
     answer = termDisplay(product.coef,v,product.exp);
   }
