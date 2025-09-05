@@ -28,7 +28,7 @@ function multiplyTerms(coef1, exp1, coef2, exp2, variable) {
 
 // Generate single-variable flashcard (Cases 1–3)
 function generateSingleVariableFlashcard(caseNum) {
-  const v = randChoice(VARIABLES); // shared variable
+  const v = randChoice(VARIABLES); // shared variable for both terms
   let a, b;
   do { a = randInt(-6,6); } while(a===0);
   do { b = randInt(-6,6); } while(b===0);
@@ -65,7 +65,7 @@ function generateTwoVariableTerm() {
   do {
     exp1 = randInt(0,4);
     exp2 = randInt(0,4);
-  } while(exp1===0 && exp2===0);
+  } while(exp1===0 && exp2===0); // at least one variable
   return { coef, v1, exp1, v2, exp2 };
 }
 
