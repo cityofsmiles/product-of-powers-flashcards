@@ -16,8 +16,10 @@ function randChoice(arr) {
 
 // Helper to format each term
 function term(coef, variable, exponent) {
-  // Omit coefficient 1
-  const coefStr = coef === 1 ? "" : coef.toString();
+  // Handle coefficient signs and omit 1
+  let coefStr = "";
+  if (coef === -1) coefStr = "-";
+  else if (coef !== 1) coefStr = coef.toString();
 
   // Exponent rules
   if (exponent === 0) return coef ? `${coef}` : "1"; // anything^0 → 1 unless coef is empty
@@ -28,8 +30,12 @@ function term(coef, variable, exponent) {
 // Generate a flashcard for one of the four exponent cases
 function generateFlashcard() {
   const caseNum = randInt(1, 4);
-  const a = randInt(1, 6);
-  const b = randInt(1, 6);
+
+  // Coefficients can be negative but nonzero
+  let a, b;
+  do { a = randInt(-6, 6); } while (a === 0);
+  do { b = randInt(-6, 6); } while (b === 0);
+
   const v1 = randChoice(VARIABLES);
   const v2 = randChoice(VARIABLES.filter((x) => x !== v1)); // For case 4
   const m = randInt(-4, 4);
