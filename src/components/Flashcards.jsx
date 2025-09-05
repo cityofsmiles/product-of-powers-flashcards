@@ -7,16 +7,16 @@ const VARIABLES = ["x","y","z","a","b","c"];
 const randInt = (min,max) => Math.floor(Math.random()*(max-min+1))+min;
 const randChoice = arr => arr[Math.floor(Math.random()*arr.length)];
 
+// Format a single term, always including the variable unless exponent = 0
 function formatTerm(coef, variable, exp){
-  // Handle zero exponent
-  if(exp === 0) return coef.toString();
-  // Handle exponent 1
+  if(exp === 0) return coef.toString();           // variable disappears
   let coefStr = "";
   if(coef === -1) coefStr="-";
-  else if(coef !== 1) coefStr = coef.toString();
+  else if(coef !== 1) coefStr=coef.toString();
   return exp === 1 ? `${coefStr}${variable}` : `${coefStr}${variable}^${exp}`;
 }
 
+// Multiply two terms
 function multiplyTerms(coef1, exp1, coef2, exp2){
   return {coef: coef1*coef2, exp: exp1+exp2};
 }
@@ -47,22 +47,28 @@ function generateSingleVariable(caseNum){
 function generateTwoVariable(){
   const v1 = randChoice(VARIABLES);
   const v2 = randChoice(VARIABLES.filter(v=>v!==v1));
+
   let coef1, coef2;
   do { coef1 = randInt(-6,6); } while(coef1===0);
   do { coef2 = randInt(-6,6); } while(coef2===0);
 
-  const exp1_1 = randInt(0,4);
-  const exp1_2 = randInt(0,4);
-  const exp2_1 = randInt(0,4);
-  const exp2_2 = randInt(0,4);
+  const exp1_v1 = randInt(0,4);
+  const exp1_v2 = randInt(0,4);
+  const exp2_v1 = randInt(0,4);
+  const exp2_v2 = randInt(0,4);
 
-  const expr = `(${formatTerm(coef1,v1,exp1_1)}${formatTerm(1,v2,exp2_1)})(${formatTerm(coef2,v1,exp1_2)}${formatTerm(1,v2,exp2_2)})`;
+  // Ensure all terms have at least one variable
+  const term1 = `${formatTerm(coef1,v1,exp1_v1)}${formatTerm(1,v2,exp1_v2)}`;
+  const term2 = `${formatTerm(coef2,v1,exp2_v1)}${formatTerm(1,v2,exp2_v2)}`;
+
+  const expr = `(${term1})(${term2})`;
+
   const finalCoef = coef1*coef2;
-  const finalExpV1 = exp1_1+exp1_2;
-  const finalExpV2 = exp2_1+exp2_2;
+  const finalExp_v1 = exp1_v1+exp2_v1;
+  const finalExp_v2 = exp1_v2+exp2_v2;
 
-  let part1 = formatTerm(finalCoef,v1,finalExpV1);
-  let part2 = finalExpV2===0 ? "" : formatTerm(1,v2,finalExpV2).replace(/^1/,"");
+  const part1 = formatTerm(finalCoef,v1,finalExp_v1);
+  const part2 = finalExp_v2===0 ? "" : formatTerm(1,v2,finalExp_v2).replace(/^1/,"");
   const answer = part1+part2;
 
   return {expr, answer};
