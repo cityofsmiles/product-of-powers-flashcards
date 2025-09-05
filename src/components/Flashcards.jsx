@@ -55,39 +55,37 @@ function generateSingleVariableFlashcard(caseNum) {
   return { expr, answer };
 }
 
-// Generate two-variable term (at least one variable)
-function generateTwoVariableTerm() {
+// Generate two-variable flashcard (Case 4)
+function generateTwoVariableFlashcard() {
   const v1 = randChoice(VARIABLES);
   const v2 = randChoice(VARIABLES.filter(x => x !== v1));
-  let coef;
-  do { coef = randInt(-6,6); } while(coef===0);
-  let exp1, exp2;
+
+  let coef1, coef2;
+  do { coef1 = randInt(-6,6); } while(coef1===0);
+  do { coef2 = randInt(-6,6); } while(coef2===0);
+
+  let exp1_term1, exp1_term2, exp2_term1, exp2_term2;
   do {
-    exp1 = randInt(0,4);
-    exp2 = randInt(0,4);
-  } while(exp1===0 && exp2===0); // at least one variable
-  return { coef, v1, exp1, v2, exp2 };
+    exp1_term1 = randInt(0,4);
+    exp1_term2 = randInt(0,4);
+    exp2_term1 = randInt(0,4);
+    exp2_term2 = randInt(0,4);
+  } while(exp1_term1 + exp1_term2 === 0 && exp2_term1 + exp2_term2 === 0); // at least one var
+
+  const expr = `(${term(coef1,v1,exp1_term1)}${term(1,v2,exp2_term1)})(${term(coef2,v1,exp1_term2)}${term(1,v2,exp2_term2)})`;
+  const answer = `${coef1*coef2}${v1}^${exp1_term1+exp1_term2}${v2}^${exp2_term1+exp2_term2}`;
+
+  return { expr, answer };
 }
 
 // Generate flashcard
 function generateFlashcard() {
   const caseNum = randInt(1,4);
-  let expr="", answer="";
-
   if(caseNum <= 3){
     return generateSingleVariableFlashcard(caseNum);
-  } else { // Case 4: two variables
-    const t1 = generateTwoVariableTerm();
-    const t2 = generateTwoVariableTerm();
-    const coef = t1.coef * t2.coef;
-    const expV1 = t1.exp1 + t2.exp1;
-    const expV2 = t1.exp2 + t2.exp2;
-    expr = `(${term(t1.coef, t1.v1, t1.exp1)}${term(1, t1.v2, t1.exp2)})` +
-           `(${term(t2.coef, t2.v1, t2.exp1)}${term(1, t2.v2, t2.exp2)})`;
-    answer = `${coef}${t1.v1}^${expV1}${t1.v2}^${expV2}`;
+  } else {
+    return generateTwoVariableFlashcard();
   }
-
-  return { expr, answer };
 }
 
 export default function Flashcards() {
