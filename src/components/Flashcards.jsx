@@ -13,7 +13,7 @@ function randChoice(arr) {
 
 // Format a term
 function term(coef, variable, exponent) {
-  if (exponent === 0) return "1";
+  if (exponent === 0) return `${coef<0?coef:""}${variable}^0`; // keep zero exponent visible
   let coefStr = "";
   if (coef === -1) coefStr = "-";
   else if (coef !== 1) coefStr = coef.toString();
@@ -28,7 +28,7 @@ function multiplyTerms(coef1, exp1, coef2, exp2, variable) {
 
 // Generate single-variable flashcard (Cases 1–3)
 function generateSingleVariableFlashcard(caseNum) {
-  const v = randChoice(VARIABLES); // shared variable for both terms
+  const v = randChoice(VARIABLES); // shared variable
   let a, b;
   do { a = randInt(-6,6); } while(a===0);
   do { b = randInt(-6,6); } while(b===0);
@@ -45,7 +45,9 @@ function generateSingleVariableFlashcard(caseNum) {
       break;
     case 3: // zero exponent
       m = randInt(1,4);
-      n = 0;
+      // Ensure second term has variable
+      n = randInt(-4, 0);
+      if(n === 0) n = -1;
       break;
     default: break;
   }
@@ -70,7 +72,7 @@ function generateTwoVariableFlashcard() {
     exp1_term2 = randInt(0,4);
     exp2_term1 = randInt(0,4);
     exp2_term2 = randInt(0,4);
-  } while(exp1_term1 + exp1_term2 === 0 && exp2_term1 + exp2_term2 === 0); // at least one var
+  } while(exp1_term1 + exp1_term2 === 0 && exp2_term1 + exp2_term2 === 0);
 
   const expr = `(${term(coef1,v1,exp1_term1)}${term(1,v2,exp2_term1)})(${term(coef2,v1,exp1_term2)}${term(1,v2,exp2_term2)})`;
   const answer = `${coef1*coef2}${v1}^${exp1_term1+exp1_term2}${v2}^${exp2_term1+exp2_term2}`;
