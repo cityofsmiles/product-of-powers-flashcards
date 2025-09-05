@@ -16,14 +16,14 @@ function randChoice(arr) {
 
 // Helper to format each term
 function term(coef, variable, exponent) {
-  // Handle coefficient signs and omit 1
+  // Omit coefficient 1, show "-" for -1
   let coefStr = "";
   if (coef === -1) coefStr = "-";
   else if (coef !== 1) coefStr = coef.toString();
 
   // Exponent rules
   if (exponent === 0) return coef ? `${coef}` : "1"; // anything^0 → 1 unless coef is empty
-  if (exponent === 1) return `${coefStr}${variable}`; // anything^1 → variable
+  if (exponent === 1) return `${coefStr}${variable}`; // exponent 1 → variable
   return `${coefStr}${variable}^${exponent}`;
 }
 
@@ -106,7 +106,6 @@ export default function Flashcards() {
   };
 
   const checkAnswer = (userInput, correct) => {
-    // Remove whitespace for comparison
     return userInput.replace(/\s+/g, "") === correct.replace(/\s+/g, "");
   };
 
