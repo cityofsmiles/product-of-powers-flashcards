@@ -13,7 +13,7 @@ function formatTerm(coef, variable, exp){
   let coefStr = "";
   if(coef === -1) coefStr="-";
   else if(coef !== 1) coefStr = coef.toString();
-  // Exponent 1 → variable only
+  // Exponent 1 → only show variable, no ^1
   return exp === 1 ? `${coefStr}${variable}` : `${coefStr}${variable}^${exp}`;
 }
 
