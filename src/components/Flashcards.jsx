@@ -21,17 +21,17 @@ function term(coef, variable, exponent) {
 
 // Term for answer display
 function termDisplay(coef, variable, exponent) {
-  if (exponent === 0) return coef.toString(); // include coefficient even if variable disappears
+  if (exponent === 0) return ""; // variable disappears
   if (exponent > 0) {
     let coefStr = "";
     if (coef === -1) coefStr = "-";
     else if (coef !== 1) coefStr = coef.toString();
     return exponent === 1 ? `${coefStr}${variable}` : `${coefStr}${variable}^${exponent}`;
   } else {
-    // negative exponent: fraction form
+    // negative exponent: fraction form, only wrap negative numerator
     const absExp = Math.abs(exponent);
-    const numerator = coef === 1 ? "1" : coef === -1 ? "-1" : coef.toString();
-    return `(${numerator})/${variable}${absExp===1?"":`^${absExp}`}`;
+    const numerator = coef < 0 ? `(${coef})` : `${coef}`;
+    return `${numerator}/${variable}${absExp===1?"":`^${absExp}`}`;
   }
 }
 
@@ -57,12 +57,16 @@ function generateSingleVariableFlashcard(caseNum) {
 
   const expr = `(${term(a,v,m)})(${term(b,v,n)})`;
   const product = multiplyTerms(a,m,b,n);
+
   let answer;
   if(product.exp === 0){
     answer = product.coef.toString();
+  } else if(product.exp < 0 && Math.abs(product.exp) > 0){
+    answer = termDisplay(product.coef,v,product.exp);
   } else {
-    answer = termDisplay(product.coef, v, product.exp);
+    answer = termDisplay(product.coef,v,product.exp);
   }
+
   return { expr, answer };
 }
 
@@ -89,7 +93,7 @@ function generateTwoVariableFlashcard() {
 
   let part1 = finalExpV1===0 ? finalCoef.toString() : termDisplay(finalCoef,v1,finalExpV1);
   let part2 = finalExpV2===0 ? "" : termDisplay(1,v2,finalExpV2).replace(/^1/,"");
-  const answer = part1 + part2;
+  const answer = part1+part2;
 
   return { expr, answer };
 }
