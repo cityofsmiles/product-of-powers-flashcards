@@ -14,6 +14,17 @@ function randChoice(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+// Helper to format each term
+function term(coef, variable, exponent) {
+  // Omit coefficient 1
+  const coefStr = coef === 1 ? "" : coef.toString();
+
+  // Exponent rules
+  if (exponent === 0) return coef ? `${coef}` : "1"; // anything^0 → 1 unless coef is empty
+  if (exponent === 1) return `${coefStr}${variable}`; // anything^1 → variable
+  return `${coefStr}${variable}^${exponent}`;
+}
+
 // Generate a flashcard for one of the four exponent cases
 function generateFlashcard() {
   const caseNum = randInt(1, 4);
@@ -33,14 +44,14 @@ function generateFlashcard() {
     case 1: // Single variable, positive exponents
       const m1 = Math.max(1, m);
       const n1 = Math.max(1, n);
-      expr = `(${a}${v1}^${m1})(${b}${v1}^${n1})`;
+      expr = `(${term(a, v1, m1)})(${term(b, v1, n1)})`;
       answer = `${a * b}${v1}^${m1 + n1}`;
       break;
 
     case 2: // Single variable, negative exponents
       const m2 = Math.max(1, m);
       const n2 = -Math.abs(n);
-      expr = `(${a}${v1}^${m2})(${b}${v1}^${n2})`;
+      expr = `(${term(a, v1, m2)})(${term(b, v1, n2)})`;
       const exponent2 = m2 + n2;
       if (exponent2 > 0) {
         answer = `${a * b}${v1}^${exponent2}`;
@@ -53,7 +64,7 @@ function generateFlashcard() {
 
     case 3: // Single variable, zero exponent
       const m3 = Math.max(1, m);
-      expr = `(${a}${v1}^${m3})(${b}${v1}^0)`;
+      expr = `(${term(a, v1, m3)})(${term(b, v1, 0)})`;
       answer = `${a * b}${v1}^${m3}`;
       break;
 
@@ -62,11 +73,8 @@ function generateFlashcard() {
       const n4 = Math.max(0, n);
       const p4 = Math.max(0, p);
       const q4 = Math.max(0, q);
-      expr = `(${a}${v1}^${m4}${v2}^${n4})(${b}${v1}^${p4}${v2}^${q4})`;
+      expr = `(${term(a, v1, m4)}${term(1, v2, n4)})(${term(b, v1, p4)}${term(1, v2, q4)})`;
       answer = `${a * b}${v1}^${m4 + p4}${v2}^${n4 + q4}`;
-      break;
-
-    default:
       break;
   }
 
@@ -92,7 +100,7 @@ export default function Flashcards() {
   };
 
   const checkAnswer = (userInput, correct) => {
-    // Remove whitespace, lowercase
+    // Remove whitespace for comparison
     return userInput.replace(/\s+/g, "") === correct.replace(/\s+/g, "");
   };
 
