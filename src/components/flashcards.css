@@ -1,4 +1,6 @@
-/* Flashcards screen (vertically centered) */
+/* =========================
+   Flashcards Container
+   ========================= */
 .flashcards-container {
   display: flex;
   flex-direction: column;
@@ -6,57 +8,72 @@
   justify-content: center;
   text-align: center;
   padding: 1rem;
-  min-height: 100vh; /* Only for flashcards screen */
+  min-height: 100vh; /* Vertically center flashcards */
 }
 
-/* Answer Key screen (top-aligned, scrollable on mobile) */
+/* Answer Key Screen */
 .answer-key-screen {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   text-align: center;
-  padding: 2rem 1rem 2rem; /* padding-top avoids cutoff */
-  overflow-y: auto; /* allow scrolling if content too tall */
-  max-height: 100vh; /* mobile-safe */
+  padding: 2rem 1rem 2rem;
+  overflow-y: auto;
+  max-height: 100vh;
 }
 
-/* Score styling with extra top spacing */
+/* Score Styling */
 .score {
-  font-size: 1.7rem;      /* bigger text */
-  font-weight: bold;       /* bold */
-  color: #2563eb;          /* blue primary */
-  margin-top: 2rem;        /* increased top spacing */
-  margin-bottom: 1rem;     /* spacing from Answer Key heading */
+  font-size: 1.7rem;
+  font-weight: bold;
+  color: #2563eb;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
   text-align: center;
 }
 
-/* Each answer spaced nicely */
+/* Each Answer Key Item */
 .answer-key p {
   text-align: center;
   margin-bottom: 1.5rem;
   line-height: 1.6;
 }
 
-/* Flashcard styling */
-.flashcard {
-  background: #ffffff;
-  width: 280px;
-  max-width: 90vw;
-  height: 160px;
+/* =========================
+   Flashcard Container & Card
+   ========================= */
+.flashcard-container {
+  width: 90%;
+  max-width: 400px;
+  min-height: 200px;
   display: flex;
-  align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  align-items: center;
+  perspective: 1000px;
   margin-bottom: 1rem;
 }
 
-/* Input field */
+.flashcard {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  width: 100%;
+  height: 200px; /* Fixed height ensures smooth transitions */
+  text-align: center;
+  padding: 0 1rem;
+}
+
+/* =========================
+   Input Field
+   ========================= */
 .input-answer {
-  width: 280px;
-  max-width: 90vw;
+  width: 100%;
+  max-width: 280px;
   padding: 0.8rem;
   font-size: 1rem;
   border-radius: 8px;
@@ -65,19 +82,24 @@
   display: block;
 }
 
-/* Buttons */
+/* =========================
+   Buttons
+   ========================= */
 .btn-primary,
 .btn-submit {
   display: inline-block;
+  width: 100%;
+  max-width: 280px;
   margin: 10px auto;
   padding: 0.8rem 1.5rem;
   border-radius: 8px;
   font-size: 1rem;
   border: none;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
-/* Button colors */
+/* Button Colors */
 .btn-primary {
   background-color: #2563eb;
   color: white;
@@ -85,6 +107,7 @@
 .btn-primary:hover {
   background-color: #1e40af;
 }
+
 .btn-submit {
   background-color: #16a34a;
   color: white;
@@ -93,7 +116,7 @@
   background-color: #15803d;
 }
 
-/* Button group spacing */
+/* Button Group */
 .button-group {
   display: flex;
   flex-direction: column;
@@ -102,23 +125,19 @@
   margin-top: 1rem;
 }
 
-.flashcard-container {
-  width: 90%;
-  min-height: 200px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  perspective: 1000px;
-}
-
-.flashcard {
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.5rem;
-  width: 100%;
-  min-height: 200px;
+/* =========================
+   Responsive Adjustments
+   ========================= */
+@media (max-width: 600px) {
+  .flashcard {
+    font-size: 1.3rem;
+    height: 180px;
+  }
+  .input-answer,
+  .btn-primary,
+  .btn-submit {
+    font-size: 0.95rem;
+    padding: 0.7rem;
+    max-width: 90%;
+  }
 }
