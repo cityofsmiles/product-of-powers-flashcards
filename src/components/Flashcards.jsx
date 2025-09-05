@@ -28,7 +28,6 @@ function termDisplay(coef, variable, exponent) {
     else if (coef !== 1) coefStr = coef.toString();
     return exponent === 1 ? `${coefStr}${variable}` : `${coefStr}${variable}^${exponent}`;
   } else {
-    // negative exponent: fraction form, no parentheses
     const absExp = Math.abs(exponent);
     return `${coef}/${variable}${absExp === 1 ? "" : `^${absExp}`}`;
   }
@@ -106,7 +105,7 @@ export default function Flashcards() {
   const [currentIndex,setCurrentIndex] = useState(0);
   const [answers,setAnswers] = useState({});
   const [showResults,setShowResults] = useState(false);
-  const [flip,setFlip] = useState(false);
+  const [transition,setTransition] = useState(false);
 
   const startPractice = () => {
     const newSet = Array.from({length:10},()=>generateFlashcard());
@@ -119,20 +118,19 @@ export default function Flashcards() {
   const handleAnswer = (value) => setAnswers({...answers,[currentIndex]:value});
   const checkAnswer = (userInput,correct) => userInput.replace(/\s+/g,"")===correct.replace(/\s+/g,"");
 
-  const prevCard = () => {
-    setFlip(true);
+  const changeCard = (direction) => {
+    setTransition(true);
     setTimeout(() => {
-      setCurrentIndex(prev=>prev===0?flashcards.length-1:prev-1);
-      setFlip(false);
+      setCurrentIndex(prev=>{
+        if(direction==="next") return prev===flashcards.length-1?0:prev+1;
+        return prev===0?flashcards.length-1:prev-1;
+      });
+      setTransition(false);
     }, 300);
   };
-  const nextCard = () => {
-    setFlip(true);
-    setTimeout(() => {
-      setCurrentIndex(prev=>prev===flashcards.length-1?0:prev+1);
-      setFlip(false);
-    }, 300);
-  };
+
+  const nextCard = () => changeCard("next");
+  const prevCard = () => changeCard("prev");
 
   if(!flashcards.length){
     return (
@@ -178,8 +176,10 @@ export default function Flashcards() {
       <h1>Product of Powers Flashcards</h1>
       <h3 style={{ fontWeight:"normal", marginBottom:"1rem" }}>by Jonathan R. Bacolod, LPT</h3>
       <h2>Question {currentIndex+1} / {flashcards.length}</h2>
-      <div className={`flashcard ${flip ? "flip" : ""}`}>
-        {currentCard.expr}
+      <div className="flashcard-container">
+        <div className={`flashcard ${transition ? "fade-out" : "fade-in"}`}>
+          {currentCard.expr}
+        </div>
       </div>
       <input
         type="text"
