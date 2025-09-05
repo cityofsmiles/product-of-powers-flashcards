@@ -1,8 +1,8 @@
 {
-  "name": "algebra-flashcards-pwa",
+  "name": "product-of-powers-flashcards-pwa",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://cityofsmiles.github.io/basic-algebra-flashcards",
+  "homepage": "https://cityofsmiles.github.io/product-of-powers-flashcards",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

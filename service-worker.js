@@ -1,4 +1,4 @@
-const CACHE_NAME = "algebra-flashcards-v1";
+const CACHE_NAME = "product-of-powers-flashcards-v1";
 const urlsToCache = [
   "/",
   "/index.html",
