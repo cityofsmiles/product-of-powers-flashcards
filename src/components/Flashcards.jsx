@@ -44,41 +44,46 @@ function multiplyTerms(coef1, exp1, coef2, exp2){
 // --- Generate exponent ---
 function getExponent(caseNum){
   switch(caseNum){
-    case 1: return randInt(1,4);      
-    case 2: return -randInt(1,4);     
-    case 3: return randInt(0,4);      
+    case 1: return randInt(1,4);      // positive
+    case 2: return -randInt(1,4);     // negative
+    case 3: return randInt(0,4);      // zero allowed
     default: return 1;
   }
 }
 
-// --- Single Variable ---
-function generateSingleVariable(caseNum){
+// --- Generate a term with guaranteed variable ---
+function generateValidTerm(minExp=0,maxExp=4){
   const v = randChoice(VARIABLES);
-  const coef1 = generateCoef();
-  const coef2 = generateCoef();
-  const exp1 = getExponent(caseNum);
-  const exp2 = getExponent(caseNum);
+  const coef = generateCoef();
+  let exp = randInt(minExp,maxExp);
+  if(exp === 0) exp = 1; // force variable to appear
+  return {coef, variable: v, exp};
+}
 
-  const expr = `(${formatTerm(coef1,v,exp1)})(${formatTerm(coef2,v,exp2)})`;
+// --- Single Variable Flashcard ---
+function generateSingleVariable(caseNum){
+  const {coef: coef1, variable: v1, exp: exp1} = generateValidTerm();
+  const {coef: coef2, variable: v2, exp: exp2} = generateValidTerm();
+
+  const expr = `(${formatTerm(coef1,v1,exp1)})(${formatTerm(coef2,v2,exp2)})`;
   const {coef: finalCoef, exp: finalExp} = multiplyTerms(coef1,exp1,coef2,exp2);
-  const answer = formatFinalTerm(finalCoef,v,finalExp);
+  const answer = formatFinalTerm(finalCoef,v1,finalExp);
+
   return {expr, answer};
 }
 
-// --- Two Variable ---
+// --- Two Variable Flashcard ---
 function generateTwoVariable(){
   const v1 = randChoice(VARIABLES);
   const v2 = randChoice(VARIABLES.filter(v=>v!==v1));
 
-  const coef1 = generateCoef();
-  const coef2 = generateCoef();
+  const {coef: coef1, exp: exp1_v1} = generateValidTerm();
+  const {coef: coef2, exp: exp2_v1} = generateValidTerm();
 
-  let exp1_v1 = randInt(0,4);
   let exp1_v2 = randInt(0,4);
-  let exp2_v1 = randInt(0,4);
   let exp2_v2 = randInt(0,4);
 
-  // Ensure at least one variable per term
+  // Ensure each term has at least one variable
   if(exp1_v1===0 && exp1_v2===0) exp1_v1=1;
   if(exp2_v1===0 && exp2_v2===0) exp2_v1=1;
 
