@@ -7,25 +7,32 @@ const VARIABLES = ["x","y","z","a","b","c"];
 const randInt = (min,max) => Math.floor(Math.random()*(max-min+1))+min;
 const randChoice = arr => arr[Math.floor(Math.random()*arr.length)];
 
-// Format single term for display in expression
+// Ensure coefficient != 0
+function generateCoef(){
+  let coef;
+  do { coef = randInt(-6,6); } while(coef===0);
+  return coef;
+}
+
+// Format single term for expressions
 function formatTerm(coef, variable, exp){
-  if(exp === 0) return coef.toString();
+  if(exp === 0) return coef.toString(); 
   let coefStr = "";
-  if(coef === -1) coefStr="-";
+  if(coef === -1) coefStr = "-";
   else if(coef !== 1) coefStr = coef.toString();
   return exp === 1 ? `${coefStr}${variable}` : `${coefStr}${variable}^${exp}`;
 }
 
-// Format final answer term, handle negative exponents as fractions
+// Format final answer, handle negative exponents as fractions
 function formatFinalTerm(coef, variable, exp){
   if(exp === 0) return coef.toString();
   if(exp > 0){
     return exp === 1 ? `${coef}${variable}` : `${coef}${variable}^${exp}`;
   } else {
-    const positiveExp = -exp;
-    if(coef === 1) return `1/${variable}${positiveExp===1?"":`^${positiveExp}`}`;
-    if(coef === -1) return `-1/${variable}${positiveExp===1?"":`^${positiveExp}`}`;
-    return `${coef}/${variable}${positiveExp===1?"":`^${positiveExp}`}`;
+    const posExp = -exp;
+    if(coef===1) return `1/${variable}${posExp===1?"":`^${posExp}`}`;
+    if(coef===-1) return `-1/${variable}${posExp===1?"":`^${posExp}`}`;
+    return `${coef}/${variable}${posExp===1?"":`^${posExp}`}`;
   }
 }
 
@@ -37,47 +44,46 @@ function multiplyTerms(coef1, exp1, coef2, exp2){
 // --- Generate exponent ---
 function getExponent(caseNum){
   switch(caseNum){
-    case 1: return randInt(1,4);      // positive
-    case 2: return -randInt(1,4);     // negative
-    case 3: return randInt(0,4);      // zero allowed
+    case 1: return randInt(1,4);      
+    case 2: return -randInt(1,4);     
+    case 3: return randInt(0,4);      
     default: return 1;
   }
 }
 
-// --- Single Variable Flashcard ---
+// --- Single Variable ---
 function generateSingleVariable(caseNum){
   const v = randChoice(VARIABLES);
-  let coef1, coef2;
-  do { coef1 = randInt(-6,6); } while(coef1===0);
-  do { coef2 = randInt(-6,6); } while(coef2===0);
-
+  const coef1 = generateCoef();
+  const coef2 = generateCoef();
   const exp1 = getExponent(caseNum);
   const exp2 = getExponent(caseNum);
 
-  const expr=`(${formatTerm(coef1,v,exp1)})(${formatTerm(coef2,v,exp2)})`;
+  const expr = `(${formatTerm(coef1,v,exp1)})(${formatTerm(coef2,v,exp2)})`;
   const {coef: finalCoef, exp: finalExp} = multiplyTerms(coef1,exp1,coef2,exp2);
   const answer = formatFinalTerm(finalCoef,v,finalExp);
-
   return {expr, answer};
 }
 
-// --- Two Variable Flashcard ---
+// --- Two Variable ---
 function generateTwoVariable(){
   const v1 = randChoice(VARIABLES);
   const v2 = randChoice(VARIABLES.filter(v=>v!==v1));
 
-  let coef1, coef2;
-  do { coef1 = randInt(-6,6); } while(coef1===0);
-  do { coef2 = randInt(-6,6); } while(coef2===0);
+  const coef1 = generateCoef();
+  const coef2 = generateCoef();
 
-  const exp1_v1 = randInt(0,4);
-  const exp1_v2 = randInt(0,4);
-  const exp2_v1 = randInt(0,4);
-  const exp2_v2 = randInt(0,4);
+  let exp1_v1 = randInt(0,4);
+  let exp1_v2 = randInt(0,4);
+  let exp2_v1 = randInt(0,4);
+  let exp2_v2 = randInt(0,4);
+
+  // Ensure at least one variable per term
+  if(exp1_v1===0 && exp1_v2===0) exp1_v1=1;
+  if(exp2_v1===0 && exp2_v2===0) exp2_v1=1;
 
   const term1 = `${formatTerm(coef1,v1,exp1_v1)}${formatTerm(1,v2,exp1_v2)}`;
   const term2 = `${formatTerm(coef2,v1,exp2_v1)}${formatTerm(1,v2,exp2_v2)}`;
-
   const expr = `(${term1})(${term2})`;
 
   const finalCoef = coef1*coef2;
