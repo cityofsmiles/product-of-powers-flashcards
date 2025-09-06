@@ -13,13 +13,22 @@ function formatTerm(coef, variable, exp){
   let coefStr = "";
   if(coef === -1) coefStr="-";
   else if(coef !== 1) coefStr = coef.toString();
-  // Exponent 1 → only show variable, no ^1
   return exp === 1 ? `${coefStr}${variable}` : `${coefStr}${variable}^${exp}`;
 }
 
 // Multiply two terms
 function multiplyTerms(coef1, exp1, coef2, exp2){
   return {coef: coef1*coef2, exp: exp1+exp2};
+}
+
+// --- Generate exponent ---
+function getExponent(caseNum){
+  switch(caseNum){
+    case 1: return randInt(1,4);      // positive
+    case 2: return -randInt(1,4);     // negative
+    case 3: return randInt(0,4);      // zero allowed
+    default: return 1;
+  }
 }
 
 // --- Single Variable Flashcard ---
@@ -29,13 +38,8 @@ function generateSingleVariable(caseNum){
   do { coef1 = randInt(-6,6); } while(coef1===0);
   do { coef2 = randInt(-6,6); } while(coef2===0);
 
-  let exp1, exp2;
-  switch(caseNum){
-    case 1: exp1=randInt(1,4); exp2=randInt(1,4); break;       // positive exponents
-    case 2: exp1=randInt(1,4); exp2=-randInt(1,4); break;      // negative exponents
-    case 3: exp1=randInt(0,4); exp2=randInt(0,4); break;       // zero exponents
-    default: exp1=1; exp2=1; break;
-  }
+  const exp1 = getExponent(caseNum);
+  const exp2 = getExponent(caseNum);
 
   const expr=`(${formatTerm(coef1,v,exp1)})(${formatTerm(coef2,v,exp2)})`;
   const {coef: finalCoef, exp: finalExp} = multiplyTerms(coef1,exp1,coef2,exp2);
@@ -58,7 +62,6 @@ function generateTwoVariable(){
   const exp2_v1 = randInt(0,4);
   const exp2_v2 = randInt(0,4);
 
-  // Ensure every term has at least one variable and no "1" exponents
   const term1 = `${formatTerm(coef1,v1,exp1_v1)}${formatTerm(1,v2,exp1_v2)}`;
   const term2 = `${formatTerm(coef2,v1,exp2_v1)}${formatTerm(1,v2,exp2_v2)}`;
 
