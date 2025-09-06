@@ -51,25 +51,16 @@ function getExponent(caseNum){
   }
 }
 
-// --- Generate a term with guaranteed variable ---
-function generateValidTerm(minExp=0,maxExp=4){
-  const v = randChoice(VARIABLES);
-  const coef = generateCoef();
-  let exp = randInt(minExp,maxExp);
-  if(exp === 0) exp = 1; // force variable to appear
-  return {coef, variable: v, exp};
-}
-
-// --- Single Variable Flashcard (fixed: same variable for both terms) ---
+// --- Single Variable Flashcard (same variable) ---
 function generateSingleVariable(caseNum){
-  const v = randChoice(VARIABLES); // single variable for whole card
+  const v = randChoice(VARIABLES); // single variable
   const coef1 = generateCoef();
   const coef2 = generateCoef();
   let exp1 = getExponent(caseNum);
   let exp2 = getExponent(caseNum);
 
-  if(exp1===0) exp1=1;
-  if(exp2===0) exp2=1;
+  if(exp1 === 0) exp1 = 1;
+  if(exp2 === 0) exp2 = 1;
 
   const expr = `(${formatTerm(coef1,v,exp1)})(${formatTerm(coef2,v,exp2)})`;
   const {coef: finalCoef, exp: finalExp} = multiplyTerms(coef1,exp1,coef2,exp2);
@@ -83,9 +74,10 @@ function generateTwoVariable(){
   const v1 = randChoice(VARIABLES);
   const v2 = randChoice(VARIABLES.filter(v=>v!==v1));
 
-  const {coef: coef1, exp: exp1_v1} = generateValidTerm();
-  const {coef: coef2, exp: exp2_v1} = generateValidTerm();
-
+  const coef1 = generateCoef();
+  const coef2 = generateCoef();
+  let exp1_v1 = randInt(1,4);
+  let exp2_v1 = randInt(1,4);
   let exp1_v2 = randInt(0,4);
   let exp2_v2 = randInt(0,4);
 
