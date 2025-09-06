@@ -14,25 +14,28 @@ function generateCoef(){
   return coef;
 }
 
-// Format single term for expressions (always show exponent, even zero)
+// Format single term for expressions (exponent 1 hidden, exponent 0 shown)
 function formatTerm(coef, variable, exp){
   let coefStr = "";
   if(coef === -1) coefStr = "-";
   else if(coef !== 1) coefStr = coef.toString();
+
+  if(exp === 0) return `${coefStr}${variable}^0`; // always show zero
+  if(exp === 1) return `${coefStr}${variable}`;   // hide exponent 1
   return `${coefStr}${variable}^${exp}`;
 }
 
 // Format final answer, handle negative exponents as fractions
 function formatFinalTerm(coef, variable, exp){
   if(exp === 0) return `${coef}${variable}^0`;
-  if(exp > 0){
-    return exp === 1 ? `${coef}${variable}` : `${coef}${variable}^${exp}`;
-  } else {
-    const posExp = -exp;
-    if(coef===1) return `1/${variable}${posExp===1?"":`^${posExp}`}`;
-    if(coef===-1) return `-1/${variable}${posExp===1?"":`^${posExp}`}`;
-    return `${coef}/${variable}${posExp===1?"":`^${posExp}`}`;
-  }
+  if(exp === 1) return `${coef}${variable}`;
+  if(exp > 1) return `${coef}${variable}^${exp}`;
+  
+  // negative exponents
+  const posExp = -exp;
+  if(coef===1) return `1/${variable}${posExp===1?"":`^${posExp}`}`;
+  if(coef===-1) return `-1/${variable}${posExp===1?"":`^${posExp}`}`;
+  return `${coef}/${variable}${posExp===1?"":`^${posExp}`}`;
 }
 
 // Multiply two terms
