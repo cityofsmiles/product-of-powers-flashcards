@@ -25,16 +25,26 @@ function formatTerm(coef, variable, exp){
   return `${coefStr}${variable}^${exp}`;
 }
 
-// Format final answer, handle negative exponents as fractions
+// Format final answer, hide coefficient 1, negative exponents as fractions
 function formatFinalTerm(coef, variable, exp){
   if(exp === 0) return `${coef}${variable}^0`;
-  if(exp === 1) return `${coef}${variable}`;
-  if(exp > 1) return `${coef}${variable}^${exp}`;
-  
-  // negative exponents
+
+  if(exp === 1){
+    if(coef === 1) return `${variable}`;
+    if(coef === -1) return `-${variable}`;
+    return `${coef}${variable}`;
+  }
+
+  if(exp > 1){
+    if(coef === 1) return `${variable}^${exp}`;
+    if(coef === -1) return `-${variable}^${exp}`;
+    return `${coef}${variable}^${exp}`;
+  }
+
+  // Negative exponent
   const posExp = -exp;
-  if(coef===1) return `1/${variable}${posExp===1?"":`^${posExp}`}`;
-  if(coef===-1) return `-1/${variable}${posExp===1?"":`^${posExp}`}`;
+  if(coef === 1) return `1/${variable}${posExp===1?"":`^${posExp}`}`;
+  if(coef === -1) return `-1/${variable}${posExp===1?"":`^${posExp}`}`;
   return `${coef}/${variable}${posExp===1?"":`^${posExp}`}`;
 }
 
@@ -53,14 +63,15 @@ function getExponent(caseNum){
   }
 }
 
-// --- Single Variable Flashcard (same variable) ---
+// --- Single Variable Flashcard ---
 function generateSingleVariable(caseNum){
-  const v = randChoice(VARIABLES); // single variable
+  const v = randChoice(VARIABLES);
   const coef1 = generateCoef();
   const coef2 = generateCoef();
   let exp1 = getExponent(caseNum);
   let exp2 = getExponent(caseNum);
 
+  // Avoid 1-only term
   if(exp1 === 0) exp1 = 1;
   if(exp2 === 0) exp2 = 1;
 
