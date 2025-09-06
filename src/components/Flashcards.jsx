@@ -14,18 +14,17 @@ function generateCoef(){
   return coef;
 }
 
-// Format single term for expressions
+// Format single term for expressions (always show exponent, even zero)
 function formatTerm(coef, variable, exp){
-  if(exp === 0) return coef.toString(); 
   let coefStr = "";
   if(coef === -1) coefStr = "-";
   else if(coef !== 1) coefStr = coef.toString();
-  return exp === 1 ? `${coefStr}${variable}` : `${coefStr}${variable}^${exp}`;
+  return `${coefStr}${variable}^${exp}`;
 }
 
 // Format final answer, handle negative exponents as fractions
 function formatFinalTerm(coef, variable, exp){
-  if(exp === 0) return coef.toString();
+  if(exp === 0) return `${coef}${variable}^0`;
   if(exp > 0){
     return exp === 1 ? `${coef}${variable}` : `${coef}${variable}^${exp}`;
   } else {
