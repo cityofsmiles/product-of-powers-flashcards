@@ -60,14 +60,20 @@ function generateValidTerm(minExp=0,maxExp=4){
   return {coef, variable: v, exp};
 }
 
-// --- Single Variable Flashcard ---
+// --- Single Variable Flashcard (fixed: same variable for both terms) ---
 function generateSingleVariable(caseNum){
-  const {coef: coef1, variable: v1, exp: exp1} = generateValidTerm();
-  const {coef: coef2, variable: v2, exp: exp2} = generateValidTerm();
+  const v = randChoice(VARIABLES); // single variable for whole card
+  const coef1 = generateCoef();
+  const coef2 = generateCoef();
+  let exp1 = getExponent(caseNum);
+  let exp2 = getExponent(caseNum);
 
-  const expr = `(${formatTerm(coef1,v1,exp1)})(${formatTerm(coef2,v2,exp2)})`;
+  if(exp1===0) exp1=1;
+  if(exp2===0) exp2=1;
+
+  const expr = `(${formatTerm(coef1,v,exp1)})(${formatTerm(coef2,v,exp2)})`;
   const {coef: finalCoef, exp: finalExp} = multiplyTerms(coef1,exp1,coef2,exp2);
-  const answer = formatFinalTerm(finalCoef,v1,finalExp);
+  const answer = formatFinalTerm(finalCoef,v,finalExp);
 
   return {expr, answer};
 }
@@ -83,7 +89,6 @@ function generateTwoVariable(){
   let exp1_v2 = randInt(0,4);
   let exp2_v2 = randInt(0,4);
 
-  // Ensure each term has at least one variable
   if(exp1_v1===0 && exp1_v2===0) exp1_v1=1;
   if(exp2_v1===0 && exp2_v2===0) exp2_v1=1;
 
