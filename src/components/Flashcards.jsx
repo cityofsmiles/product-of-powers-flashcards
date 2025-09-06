@@ -7,13 +7,26 @@ const VARIABLES = ["x","y","z","a","b","c"];
 const randInt = (min,max) => Math.floor(Math.random()*(max-min+1))+min;
 const randChoice = arr => arr[Math.floor(Math.random()*arr.length)];
 
-// Format a single term, always including variable unless exponent = 0
+// Format single term for display in expression
 function formatTerm(coef, variable, exp){
-  if(exp === 0) return coef.toString(); // variable disappears
+  if(exp === 0) return coef.toString();
   let coefStr = "";
   if(coef === -1) coefStr="-";
   else if(coef !== 1) coefStr = coef.toString();
   return exp === 1 ? `${coefStr}${variable}` : `${coefStr}${variable}^${exp}`;
+}
+
+// Format final answer term, handle negative exponents as fractions
+function formatFinalTerm(coef, variable, exp){
+  if(exp === 0) return coef.toString();
+  if(exp > 0){
+    return exp === 1 ? `${coef}${variable}` : `${coef}${variable}^${exp}`;
+  } else {
+    const positiveExp = -exp;
+    if(coef === 1) return `1/${variable}${positiveExp===1?"":`^${positiveExp}`}`;
+    if(coef === -1) return `-1/${variable}${positiveExp===1?"":`^${positiveExp}`}`;
+    return `${coef}/${variable}${positiveExp===1?"":`^${positiveExp}`}`;
+  }
 }
 
 // Multiply two terms
@@ -43,7 +56,7 @@ function generateSingleVariable(caseNum){
 
   const expr=`(${formatTerm(coef1,v,exp1)})(${formatTerm(coef2,v,exp2)})`;
   const {coef: finalCoef, exp: finalExp} = multiplyTerms(coef1,exp1,coef2,exp2);
-  const answer = formatTerm(finalCoef,v,finalExp);
+  const answer = formatFinalTerm(finalCoef,v,finalExp);
 
   return {expr, answer};
 }
@@ -71,8 +84,8 @@ function generateTwoVariable(){
   const finalExp_v1 = exp1_v1+exp2_v1;
   const finalExp_v2 = exp1_v2+exp2_v2;
 
-  const part1 = formatTerm(finalCoef,v1,finalExp_v1);
-  const part2 = finalExp_v2===0 ? "" : formatTerm(1,v2,finalExp_v2).replace(/^1/,"");
+  const part1 = formatFinalTerm(finalCoef,v1,finalExp_v1);
+  const part2 = finalExp_v2===0 ? "" : formatFinalTerm(1,v2,finalExp_v2).replace(/^1/,"");
   const answer = part1+part2;
 
   return {expr, answer};
